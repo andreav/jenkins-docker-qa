@@ -1,9 +1,9 @@
 # Manifest
 
-This project is an how-to for setting up a Jenkins docker installation on Windows.
+This project is a how-to for setting up a Jenkins docker installation on Windows.
 
 Main features:
-* Docekrfile for build a custom Docker Image (built on top of the official one)
+* Dockerfile for building a custom Docker Image (built on top of the official one)
 * Docker command for speeding up try/fail/retry process
 * Configuration by [Configuration as Code](https://https://plugins.jenkins.io/configuration-as-code/) plugin
 * Prepopulated with test jobs (remember to [approve](https://stackoverflow.com/a/45771737/1966366) scripts before runnig them otherwise they'll fail)
