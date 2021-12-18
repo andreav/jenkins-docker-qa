@@ -1,5 +1,3 @@
-Refs - https://www.jenkins.io/doc/book/installing/docker/#on-windows
-
 # Manifest
 
 This project is an how-to for setting up a Jenkins docker installation on Windows.
