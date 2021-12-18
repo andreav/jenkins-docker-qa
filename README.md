@@ -5,8 +5,8 @@ This project is an how-to for setting up a Jenkins docker installation on Window
 Main features:
 * Docekrfile for build a custom Docker Image (built on top of the official one)
 * Docker command for speeding up try/fail/retry process
-* Configuration by Jenkins [Configuration as Code](https://https://plugins.jenkins.io/configuration-as-code/)
-* Prepopulated with test jobs (remmber to [approve](https://stackoverflow.com/a/45771737/1966366) scripts before runnig them otherwise they'll fail)
+* Configuration by [Configuration as Code](https://https://plugins.jenkins.io/configuration-as-code/) plugin
+* Prepopulated with test jobs (remember to [approve](https://stackoverflow.com/a/45771737/1966366) scripts before runnig them otherwise they'll fail)
 * Test job for spinning a docker agent
 
 # Shell
