@@ -1,0 +1,40 @@
+jobs:
+  - script: >
+      folder('test_jobs')
+  - script: >
+      pipelineJob('test_jobs/default-agent') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                agent any
+                stages {
+                  stage ('test') {
+                    steps {
+                      echo "hello"
+                    }
+                  }
+                }
+              }""".stripIndent())
+          }
+        }
+      }
+  - script: >
+      pipelineJob('test_jobs/docker-agent') {
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                    agent { docker { image 'node:16.13.1-alpine' } }
+                    stages {
+                        stage('build') {
+                            steps {
+                              sh 'node --version'
+                            }
+                        }
+                    }
+                }""".stripIndent())
+          }
+        }
+      }
+
