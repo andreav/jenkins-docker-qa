@@ -1,0 +1,72 @@
+jobs:
+  - script: >
+      folder('test_jobs')
+  - script: >
+      pipelineJob('test_jobs/default-agent') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                agent any
+                stages {
+                  stage ('test') {
+                    steps {
+                      echo "hello"
+                    }
+                  }
+                }
+              }""".stripIndent())
+          }
+        }
+      }
+  - script: >
+      pipelineJob('test_jobs/docker-agent') {
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                    agent { docker { image 'node:16.13.1-alpine' } }
+                    stages {
+                        stage('build') {
+                            steps {
+                              sh 'node --version'
+                            }
+                        }
+                    }
+                }""".stripIndent())
+              }
+            }
+          }
+  - script: >
+      freeStyleJob('test_jobs/push_image_to_local_registry') {
+        description('Pulling an image from docker hub, tagging and pushing to local registry. Must first run a local registry')
+        steps {
+          shell('docker pull ubuntu')
+          shell('docker image tag ubuntu host.docker.internal:5000/myubuntu')
+          shell('docker push host.docker.internal:5000/myubuntu')
+        }
+      }
+  - script: >
+      pipelineJob('test_jobs/docker-agent-from-local-registry') {
+        description('Pulling an image from a local registry. Must first run a local registry an populate with an image')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                    agent { 
+                      docker { 
+                        image 'myubuntu'
+                        registryUrl 'http://host.docker.internal:5000/'
+                      } 
+                    }
+                    stages {
+                        stage('build') {
+                            steps {
+                              sh 'echo "Working!"'
+                            }
+                        }
+                    }
+                }""".stripIndent())
+              }
+            }
+          }
