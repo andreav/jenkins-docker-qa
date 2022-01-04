@@ -23,3 +23,6 @@ docker-commons:latest
 docker-plugin:latest
 docker-workflow:latest
 job-dsl:latest
+xunit:latest
+cobertura:latest
+mstest:latest

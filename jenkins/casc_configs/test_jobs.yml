@@ -79,17 +79,53 @@ jobs:
                 pipeline {
                   agent any
                   stages {
-                      stage('checkout') {
-                          steps {
-                            checkout([
-                              \$class: 'GitSCM', 
-                              branches: [[name: '*/master']], 
-                              extensions: [], 
-                              userRemoteConfigs: [[url: 'https://github.com/andreav/pitstop']]
-                            ])
-                          }
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        checkout([
+                          \$class: 'GitSCM', 
+                          branches: [[name: '*/master']], 
+                          extensions: [], 
+                          userRemoteConfigs: [[url: 'https://github.com/andreav/pitstop']]
+                        ])
                       }
-                  }
+                    }
+
+                    stage('run test in docker agent') {
+                      environment {
+                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                      }
+                      agent { 
+                        docker { 
+                            image 'mcr.microsoft.com/dotnet/sdk:5.0' 
+                            reuseNode true
+                        } 
+                      }			
+                      steps {
+                        dir("./src/WorkshopManagement.UnitTests") {
+                            sh "dotnet test .  --logger:trx --results-directory ./TestResults /p:CollectCoverage=true /p:CollectCoverage=true    /p:CoverletOutput=./TestResults/ /p:CoverletOutputFormat=cobertura"
+
+                        }                        
+
+                        // with plugin xUnit
+                        xunit([
+                            MSTest(
+                                deleteOutputFiles: false,
+                                failIfNotNew: true,
+                                pattern: '**/*.trx',
+                                skipNoTestFiles: false,
+                                stopProcessingIfError: true
+                            )
+                        ])
+
+                        // with mstest plugin
+                        //mstest failOnError: false
+                        
+                        cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/*cobertura.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+                      }
+                    }    
+                  }                
                 }""".stripIndent())
               }
             }
