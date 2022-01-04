@@ -38,7 +38,7 @@ Using docker in docker
 # Login
 
     # From powershell, not working from bash (must use 2 leading slashes from bash)
-    docker exec -it jenkins-lts cat /var/jenkins_home/secrets/initialAdminPassword
+    docker exec -it jenkins-plug cat /var/jenkins_home/secrets/initialAdminPassword
 
     login User: admin
     login passowrd: output from previous command
