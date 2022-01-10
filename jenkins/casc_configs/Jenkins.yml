@@ -1,6 +1,6 @@
 unclassified:
   location:
-    url: http://localhost:8080/
+    url: http://localhost:8181/
 
 jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"

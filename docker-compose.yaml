@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  jenkins:
+    build: ./jenkins
+    container_name: ci-jenkins
+    ports:
+      - "8181:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - jenkins-docker-certs:/certs/client:ro
+    environment:
+      - DOCKER_HOST=tcp://host.docker.internal:2375
+  registry:
+    image: registry:2
+    container_name: ci-registry
+    ports:
+      - "5000:5000"
+  sonarqube:
+    image: sonarqube:latest
+    container_name: ci-sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=false
+
+volumes:
+  jenkins-data:
+  jenkins-docker-certs:

@@ -31,7 +31,7 @@ Using docker in docker
      .\script\stop-destroy-jenkins-with-dind.ps1
 # Extract plugin list from running jenkins to populate plugins.txt
 
-    $ JENKINS_HOST=admin:admin@localhost:8080
+    $ JENKINS_HOST=admin:admin@localhost:8181
     $ curl -sSL "http://$JENKINS_HOST/pluginManager/api/xml?depth=1&xpath=/*/*/shortName|/*/*/version&wrapper=plugins" | perl -pe 's/.*?<shortName>([\w-]+).*?<version>([^<]+)()(<\/\w+>)+/\1 \2\n/g'|sed 's/ /:/'
    
 
