@@ -85,18 +85,12 @@ jobs:
                       steps {
                         cleanWs()
 
-                        checkout([
-                          \$class: 'GitSCM', 
-                          branches: [[name: '*/master']], 
-                          extensions: [], 
-                          userRemoteConfigs: [[url: 'https://github.com/andreav/pitstop']]
-                        ])
+                        git url: 'https://github.com/andreav/pitstop'
                       }
                     }
 
                     stage('run sonarscanner in docker agent') {
                       environment {
-                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
                         SONARQUBE_PROJECT_NAME="testproject"
                         SONARQUBE_URL="http://host.docker.internal:9000"
                         SONARQUBE_LOGIN=credentials("sonarqube-token-admin")
@@ -106,12 +100,7 @@ jobs:
                           image 'netcore-sonarscanner'
                           registryUrl 'http://host.docker.internal:5000/'
                           reuseNode true
-                          // refs - https://issues.jenkins.io/browse/JENKINS-49076
-                          // Setting PATH is not so straightforward
-                          args '''
-                                  -u root
-                                  -e PATH="\$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools"
-                                '''            
+                          args '-u root'
                         } 
                       }			
                       steps {
@@ -124,7 +113,7 @@ jobs:
                         }
                       }
                     }    
-                  }                
+                  }                       
                 }""".stripIndent())
               }
             }
