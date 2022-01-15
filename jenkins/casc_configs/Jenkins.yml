@@ -1,7 +1,7 @@
 unclassified:
   location:
     url: http://localhost:8181/
-
+        
 jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code plugin\n\n"
   globalNodeProperties:
@@ -40,3 +40,7 @@ credentials:
               privateKeySource:
                 directEntry:
                   privateKey: ${SSH_PRIVATE_KEY}
+          - string:
+              id: "sonarqube-token-admin"
+              scope: GLOBAL
+              secret: "update_me_after_setup"

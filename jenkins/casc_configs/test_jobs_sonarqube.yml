@@ -1,0 +1,131 @@
+jobs:
+  - script: >
+      folder('test_jobs_sonarqube')
+  - script: >
+      freeStyleJob('test_jobs_sonarqube/01_build_netcore_sonarscanner_image_and_push_to_local_registry') {
+        description('Build a netcore image with sonarscanner and push to local regystry')
+        wrappers {
+          preBuildCleanup()
+        }
+        steps {
+          shell('git clone https://github.com/andreav/jenkins-docker-qa.git')
+          shell('cd jenkins-docker-qa/sonarqube/sonarqube-netcore-scanner && docker build -t host.docker.internal:5000/netcore-sonarscanner .')
+          shell('docker push host.docker.internal:5000/netcore-sonarscanner')
+        }
+      }
+  - script: >
+      pipelineJob('test_jobs_sonarqube/02_sonarscanner-in-docker-agent-netcore') {
+        description('Sonarscanner in docker agent')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        checkout([
+                          \$class: 'GitSCM', 
+                          branches: [[name: '*/master']], 
+                          extensions: [], 
+                          userRemoteConfigs: [[url: 'https://github.com/andreav/pitstop']]
+                        ])
+                      }
+                    }
+
+                    stage('run sonarscanner in docker agent') {
+                      environment {
+                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                        SONARQUBE_PROJECT_NAME="testproject"
+                        SONARQUBE_URL="http://host.docker.internal:9000"
+                        SONARQUBE_LOGIN=credentials("sonarqube-token-admin")
+                      }
+                      agent { 
+                        docker { 
+                          image 'mcr.microsoft.com/dotnet/sdk:5.0' 
+                          reuseNode true
+                          // refs - https://issues.jenkins.io/browse/JENKINS-49076
+                          // Setting PATH is not so straightforward
+                          args '''
+                                  -u root
+                                  -e PATH="\$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools"
+                                '''            
+                        } 
+                      }			
+                      steps {
+                        sh "apt-get update && apt-get install -y default-jre"
+                        sh "dotnet tool install --global dotnet-sonarscanner"  
+                          
+                        dir("./src/") {
+                            sh "dotnet sonarscanner begin /k:\$SONARQUBE_PROJECT_NAME /d:sonar.host.url=\$SONARQUBE_URL /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml /d:sonar.cs.vstest.reportsPaths=./TestResults/testresults.trx /d:sonar.login=\$SONARQUBE_LOGIN"
+                            sh "dotnet build pitstop.sln"
+                            // Note ./TestResult but ../TestResult for coverage
+                            sh "dotnet test WorkshopManagement.UnitTests --logger 'trx;LogFileName=testresults.trx' --results-directory ./TestResults /p:CollectCoverage=true /p:CoverletOutput=../TestResults/ /p:CoverletOutputFormat=cobertura%2Copencover%2Cjson"
+                            sh "dotnet sonarscanner end /d:sonar.login=\$SONARQUBE_LOGIN"
+                        }
+                      }
+                    }    
+                  }                
+                }""".stripIndent())
+              }
+            }
+          }
+  - script: >
+      pipelineJob('test_jobs_sonarqube/03_sonarscanner-in-docker-agent-netcore-scanner') {
+        description('Sonarscanner in docker agent')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        checkout([
+                          \$class: 'GitSCM', 
+                          branches: [[name: '*/master']], 
+                          extensions: [], 
+                          userRemoteConfigs: [[url: 'https://github.com/andreav/pitstop']]
+                        ])
+                      }
+                    }
+
+                    stage('run sonarscanner in docker agent') {
+                      environment {
+                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                        SONARQUBE_PROJECT_NAME="testproject"
+                        SONARQUBE_URL="http://host.docker.internal:9000"
+                        SONARQUBE_LOGIN=credentials("sonarqube-token-admin")
+                      }
+                      agent { 
+                        docker { 
+                          image 'netcore-sonarscanner'
+                          registryUrl 'http://host.docker.internal:5000/'
+                          reuseNode true
+                          // refs - https://issues.jenkins.io/browse/JENKINS-49076
+                          // Setting PATH is not so straightforward
+                          args '''
+                                  -u root
+                                  -e PATH="\$PATH:/tmp/DOTNET_CLI_HOME/.dotnet/tools"
+                                '''            
+                        } 
+                      }			
+                      steps {
+                        dir("./src/") {
+                            sh "dotnet sonarscanner begin /k:\$SONARQUBE_PROJECT_NAME /d:sonar.host.url=\$SONARQUBE_URL /d:sonar.cs.opencover.reportsPaths=./TestResults/coverage.opencover.xml /d:sonar.cs.vstest.reportsPaths=./TestResults/testresults.trx /d:sonar.login=\$SONARQUBE_LOGIN"
+                            sh "dotnet build pitstop.sln"
+                            // Note ./TestResult but ../TestResult for coverage
+                            sh "dotnet test WorkshopManagement.UnitTests --logger 'trx;LogFileName=testresults.trx' --results-directory ./TestResults /p:CollectCoverage=true /p:CoverletOutput=../TestResults/ /p:CoverletOutputFormat=cobertura%2Copencover%2Cjson"
+                            sh "dotnet sonarscanner end /d:sonar.login=\$SONARQUBE_LOGIN"
+                        }
+                      }
+                    }    
+                  }                
+                }""".stripIndent())
+              }
+            }
+          }              
