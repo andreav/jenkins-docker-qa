@@ -44,6 +44,11 @@ Main features:
 
     * Dockerfile for creating a sonarqube netcore scanner for using as docker agent 
 
+* selenium folder
+
+    * a docker-compose.yml file for setting up a basic selenium grid
+    * a xUnit project for testing the grid
+
 # docker compose
 
 Project ships with a docker compose for bringing up all toghether (jenkins, registry, sonarqube)
