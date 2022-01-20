@@ -20,12 +20,19 @@ jobs:
                         dir('ci') {
                             git url: 'https://github.com/andreav/jenkins-docker-qa.git'
                         }
-
-                        sh "docker-compose -p seleniumgrid-\$BUILD_NUMBER -f ./ci/selenium/docker-compose.yml up"
                       }
                     }
 
                     stage('setting up selenium grid') {
+                      steps {
+                        sh "docker-compose -p seleniumgrid-\$BUILD_NUMBER -f ./ci/selenium/docker-compose.yml up -d"
+                      }
+                    }
+
+                    stage('running UI tests') {
+                      environment {
+                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                      }
                       agent { 
                         docker { 
                           image 'mcr.microsoft.com/dotnet/sdk:5.0' 
@@ -33,10 +40,16 @@ jobs:
                         } 
                       }			
                       steps {
-                        sh 'find .'                        
+                        // shoul run sut & sut tests .. now just run a demo UI test here
+                        ./ci/selenium/wait-scripts/wait-for-grid.sh  sh 'dotnet test ./ci/selenium/xunit-selenium-tests'
                       }
                     }    
-                  }                       
+                  }
+                  post {
+                    always {
+                        sh "docker-compose -p seleniumgrid-\$BUILD_NUMBER -f ./ci/selenium/docker-compose.yml down -v"
+                    }
+                  }   
                 }""".stripIndent())
               }
             }
