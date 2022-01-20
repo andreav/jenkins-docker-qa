@@ -26,6 +26,8 @@ jobs:
                     stage('setting up selenium grid') {
                       steps {
                         sh "docker-compose -p seleniumgrid-\$BUILD_NUMBER -f ./ci/selenium/docker-compose.yml up -d"
+                        sh 'chmod +x ./ci/selenium/wait-for-grid.sh'
+                        sh './ci/selenium/wait-for-grid.sh'                        
                       }
                     }
 
@@ -40,9 +42,8 @@ jobs:
                         } 
                       }			
                       steps {
-                        // shoul run sut & sut tests .. now just run a demo UI test here
-                        sh 'chmod +x ./ci/selenium/wait-scripts/wait-for-grid.sh'
-                        sh './ci/selenium/wait-scripts/wait-for-grid.sh dotnet test ./ci/selenium/xunit-selenium-tests'
+                        // should run sut & sut tests .. now just run a demo UI test here
+                        dotnet test ./ci/selenium/xunit-selenium-tests'
                       }
                     }    
                   }
