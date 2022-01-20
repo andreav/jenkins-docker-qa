@@ -1,0 +1,43 @@
+jobs:
+  - script: >
+      folder('test_jobs_selenium')
+  - script: >
+      pipelineJob('test_jobs_selenium/run_ui_tests_against_basic_grid') {
+        description('Runs a selenium grid with 3 browsers and run tests against that grid')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        dir('sut') {
+                            git url: 'https://github.com/andreav/pitstop'
+                        }
+                        dir('ci') {
+                            git url: 'https://github.com/andreav/jenkins-docker-qa.git'
+                        }
+
+                        sh "docker-compose -p seleniumgrid-\$BUILD_NUMBER -f ./ci/selenium/docker-compose.yml up"
+                      }
+                    }
+
+                    stage('setting up selenium grid') {
+                      agent { 
+                        docker { 
+                          image 'mcr.microsoft.com/dotnet/sdk:5.0' 
+                          reuseNode true
+                        } 
+                      }			
+                      steps {
+                        sh 'find .'                        
+                      }
+                    }    
+                  }                       
+                }""".stripIndent())
+              }
+            }
+          }              
