@@ -67,9 +67,6 @@ public class UITests
         DriverOptions chromeOptions = Activator.CreateInstance(DriverOptionsType) as DriverOptions ?? throw new ArgumentNullException("Invalid type", nameof(DriverOptionsType));
         IWebDriver driver = new RemoteWebDriver(new Uri(selenium_hub_address), chromeOptions);
         driver.Navigate().GoToUrl("http://www.google.com");
-        Console.WriteLine("Prima della wait");
-        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
-        output.WriteLine("Dopo la wait");
         driver.Quit();
     }
 
@@ -78,10 +75,6 @@ public class UITests
         var retParams = new List<object[]>();
         foreach (var curr_params in test_params)
         {
-            // object[] x = new object[] {1, "A"};
-            // x = x.Prepend("1").ToArray();
-            // x = x.Prepend(typeof(ChromeOptions)).ToArray();
-
             retParams.Add(curr_params.Prepend(typeof(ChromeOptions)).ToArray());
             retParams.Add(curr_params.Prepend(typeof(FirefoxOptions)).ToArray());
             retParams.Add(curr_params.Prepend(typeof(EdgeOptions)).ToArray());
