@@ -26,6 +26,8 @@ Main features:
           * Static code analysis
           * Code coverage
           * Test results
+    * Test jobs selenium:
+        * a pipeline running a basic grid (3 browsers) and xunit UI tests against this grid
           
 * registry folder
 
