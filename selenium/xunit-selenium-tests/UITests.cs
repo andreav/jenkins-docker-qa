@@ -55,9 +55,6 @@ public class UITests
         // chromeOptions.PlatformName = "Windows XP";
         IWebDriver driver = new RemoteWebDriver(new Uri(selenium_hub_address), chromeOptions);
         driver.Navigate().GoToUrl("http://www.google.com");
-        Console.WriteLine("Prima della wait");
-        WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
-        output.WriteLine("Dopo la wait");
         driver.Quit();
 
     }
