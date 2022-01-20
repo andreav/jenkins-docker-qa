@@ -24,10 +24,12 @@ public enum BrowserType
 public class UITests
 {
     private readonly ITestOutputHelper output;
+    private readonly string selenium_hub_address;
 
     public UITests(ITestOutputHelper output)
     {
         this.output = output;
+        this.selenium_hub_address = Environment.GetEnvironmentVariable("SELENIUM_HUB_ADDRESS") ?? "http://localhost:4444";
     }
 
     public static IWebDriver Create_Browser(BrowserType browserType)
@@ -51,7 +53,7 @@ public class UITests
         var chromeOptions = new ChromeOptions();
         // chromeOptions.BrowserVersion = "67";
         // chromeOptions.PlatformName = "Windows XP";
-        IWebDriver driver = new RemoteWebDriver(new Uri("http://localhost:4444"), chromeOptions);
+        IWebDriver driver = new RemoteWebDriver(new Uri(selenium_hub_address), chromeOptions);
         driver.Navigate().GoToUrl("http://www.google.com");
         Console.WriteLine("Prima della wait");
         WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
@@ -66,7 +68,7 @@ public class UITests
     public void Test_Theory_InlineBrowser(Type DriverOptionsType)
     {
         DriverOptions chromeOptions = Activator.CreateInstance(DriverOptionsType) as DriverOptions ?? throw new ArgumentNullException("Invalid type", nameof(DriverOptionsType));
-        IWebDriver driver = new RemoteWebDriver(new Uri("http://localhost:4444"), chromeOptions);
+        IWebDriver driver = new RemoteWebDriver(new Uri(selenium_hub_address), chromeOptions);
         driver.Navigate().GoToUrl("http://www.google.com");
         Console.WriteLine("Prima della wait");
         WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
@@ -103,10 +105,9 @@ public class UITests
     public void Test_Parametrized_MultipleBrowsers(Type DriverOptionsType, string url)
     {
         DriverOptions driverOptions = Activator.CreateInstance(DriverOptionsType) as DriverOptions ?? throw new ArgumentNullException("Invalid type", nameof(DriverOptionsType));
-        using (IWebDriver driver = new RemoteWebDriver(new Uri("http://localhost:4444"), driverOptions))
+        using (IWebDriver driver = new RemoteWebDriver(new Uri(selenium_hub_address), driverOptions))
         {
             driver.Navigate().GoToUrl(url);
         }
     }
-
 }
