@@ -1,0 +1,32 @@
+jobs:
+  - script: >
+      folder('test_jobs_k6')
+  - script: >
+      pipelineJob('test_jobs_k6/run_load_k6_tests') {
+        description('Runs k6 load tests. In order to view results in grafana, first raise grafana+influxdb stack')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        git url: 'https://github.com/andreav/jenkins-docker-qa.git'
+                      }
+                    }
+
+                    stage('running Load tests') {
+                      steps {
+                        dir("./k6/") {
+                            sh 'docker run --rm -i -v ${PWD}:/work loadimpact/k6 run --out json=/work/k6-test-results.json /work/load_tests.js'
+                        }
+                      }
+                    }    
+                  }
+                }""".stripIndent())
+              }
+            }
+          }              
