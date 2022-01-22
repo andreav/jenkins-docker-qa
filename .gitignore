@@ -2,6 +2,5 @@
 **/bin/
 **/TestResults/
 **/.vs/
-k6/out-100.json
-k6/out-1000.json
-k6/out.json
+k6/summary.html
+k6/k6-test-results.json

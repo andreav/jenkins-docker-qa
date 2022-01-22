@@ -19,12 +19,21 @@ jobs:
                     }
 
                     stage('running Load tests') {
+                      agent { 
+                        docker { 
+                          image 'loadimpact/k6' 
+                          reuseNode true
+                          // This image is not interactive and is designed for running k6 and exiting immedeately
+                          // Make it interactive and remove k6 entrypoint
+                          // refs - https://stackoverflow.com/questions/52558150/jenkins-pipeline-docker-container-is-not-running
+                          args "-i --entrypoint="
+                        } 
+                      }			
                       steps {
-                        dir("./k6/") {
-                            sh 'docker run --rm -i -v ${PWD}:/work loadimpact/k6 run --out json=/work/k6-test-results.json /work/load_tests.js'
-                        }
+                        sh 'k6 run -e K6_TEST_RESULTS_HTML_FULL_FILE_PATH="./k6-test.results.html" --out json=./k6-test-results.json ./k6/load_tests.js'
                       }
-                    }    
+                    }
+
                   }
                 }""".stripIndent())
               }

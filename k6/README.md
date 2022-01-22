@@ -18,7 +18,16 @@ You can specify options in test file. Here is an example if you wat to pass them
 
 Note, mounting local folder also mounts load tests => no more redirections needed
 
-    docker run --rm -i -v ${PWD}:/work loadimpact/k6 run --out json=/work/out.json /work/load_tests.js
+    docker run --rm -i -v ${PWD}:/work loadimpact/k6 run --out json=/work/k6-test-results.json /work/load_tests.js
+
+## Generating HTML report
+
+Provided test script also can also generate and HTML report if you provide an environment variable K6_TEST_RESULTS_HTML_FULL_FILE_PATH containing the destination report path. Thanks to [this project](https://github.com/benc-uk/k6-reporter)
+
+    docker run --rm -i -e K6_TEST_RESULTS_HTML_FULL_FILE_PATH="/work/summary.html" -v ${PWD}:/work loadimpact/k6 run --out json=/work/k6-test-results.json /work/load_tests.js
+## loggin into the container
+
+    docker run --rm -it --entrypoint sh loadimpact/k6
 
 # Report results: granfana + influxdb (1.8)
 
