@@ -56,3 +56,14 @@ Due to [this issue](https://github.com/grafana/grafana/issues/10786) it is not s
 So I modified the [k6 dashbord](https://grafana.com/grafana/dashboards/2587) replacing "${DS_K6}" with the provisioned datasource UID:  "influxdb-k6-uid"   
 
 
+# Report results: jenkins + HTML publisher
+
+Thanks to [k6-reporter](https://github.com/benc-uk/k6-reporter) project one Jenkins job is configured for publishing results as HTML
+
+The result is something like this:
+
+![Jenkins HTML report](../images/jenkins-k6-test-results-html.png "Jenkins HTML report")
+
+and
+
+![Jenkins HTML report stats](../images/jenkins-k6-test-results-html-stats.png "Jenkins HTML report stats")

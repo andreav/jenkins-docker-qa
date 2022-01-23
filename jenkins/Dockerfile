@@ -1,6 +1,9 @@
 FROM jenkins/jenkins:lts-jdk11
 
-ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/
+# ATTENTION DirectoryBrowserSupport.CSP lowers security. It is used for correctly visualizing K6 HTML report. If it is not necessary, remove that line
+ENV JAVA_OPTS -Djenkins.install.runSetupWizard=false \
+              -Dcasc.jenkins.config=/var/jenkins_home/casc_configs/ \
+              -Dhudson.model.DirectoryBrowserSupport.CSP=\"sandbox; default-src \'none\'; img-src \'self\' raw.githubusercontent.com/benc-uk/k6-reporter/main/assets/icon.png; style-src \'self\' use.fontawesome.com unpkg.com \'unsafe-inline\'; font-src use.fontawesome.com;\"
 
 USER root
 RUN apt-get update && apt-get install -y lsb-release

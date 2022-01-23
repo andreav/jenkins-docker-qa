@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  sonarqube:
+    image: sonarqube:latest
+    depends_on:
+      - sonarqube-db
+    ports:
+      - "9000:9000"
+    networks:
+      - sonarnet
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+
+  sonarqube-db:
+    image: postgres
+    networks:
+      - sonarnet
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+    volumes:
+      - sonarqube_postgresql:/var/lib/postgresql
+      # This needs explicit mapping due to https://github.com/docker-library/postgres/blob/4e48e3228a30763913ece952c611e5e9b95c8759/Dockerfile.template#L52
+      - sonarqube_postgresql_data:/var/lib/postgresql/data
+
+networks:
+  sonarnet:
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  sonarqube_temp:
+  sonarqube_postgresql:
+  sonarqube_postgresql_data:

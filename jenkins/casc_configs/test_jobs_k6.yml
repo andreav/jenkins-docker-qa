@@ -2,8 +2,8 @@ jobs:
   - script: >
       folder('test_jobs_k6')
   - script: >
-      pipelineJob('test_jobs_k6/run_load_k6_tests') {
-        description('Runs k6 load tests. In order to view results in grafana, first raise grafana+influxdb stack')
+      pipelineJob('test_jobs_k6/run_load_k6_tests_html_result') {
+        description('Runs k6 load tests and visualize results with HTML Publish plugin.')
         definition {
           cps {
             script("""\
@@ -31,6 +31,16 @@ jobs:
                       }			
                       steps {
                         sh 'k6 run -e K6_TEST_RESULTS_HTML_FULL_FILE_PATH="./k6-test.results.html" --out json=./k6-test-results.json ./k6/load_tests.js'
+
+                        publishHTML([
+                                      allowMissing: false, 
+                                      alwaysLinkToLastBuild: false, 
+                                      keepAll: false, 
+                                      reportDir: '', 
+                                      reportFiles: 'k6-test.results.html', 
+                                      reportName: 'K6 Tests Report', 
+                                      reportTitles: ''
+                                    ])
                       }
                     }
 
@@ -39,3 +49,42 @@ jobs:
               }
             }
           }              
+  - script: >
+      pipelineJob('test_jobs_k6/run_load_k6_tests_grafana_result') {
+        description('Runs k6 load tests and push results to influxdb to be visualized by grafana dashboard. In order to view results in grafana, first docker compose -f k6/docker-compose.yaml up')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        git url: 'https://github.com/andreav/jenkins-docker-qa.git'
+                      }
+                    }
+
+                    stage('running Load tests') {
+                      agent { 
+                        docker { 
+                          image 'loadimpact/k6' 
+                          reuseNode true
+                          // This image is not interactive and is designed for running k6 and exiting immedeately
+                          // Make it interactive and remove k6 entrypoint
+                          // refs - https://stackoverflow.com/questions/52558150/jenkins-pipeline-docker-container-is-not-running
+                          args "-i --entrypoint="
+                        } 
+                      }			
+                      steps {
+                        sh 'k6 run -o influxdb=http://host.docker.internal:8087/k6 ./k6/load_tests.js'
+                      }
+                    }
+
+                  }
+                }""".stripIndent())
+              }
+            }
+          }              
+
