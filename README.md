@@ -1,4 +1,4 @@
-This project is a starter kit for setting up a Jenkins docker installation on Windows and related CI/CD and QA utilities  
+This project is a starter kit for setting up a Jenkins docker installation for CI and QA.  
 
 Tools integrated:
 
@@ -10,6 +10,9 @@ Tools integrated:
 * [xUnit.Net](https://xunit.net/)
 * [Selenium](https://www.selenium.dev/)
 * [k6](https://k6.io/)
+* [grafana](https://grafana.com/)
+
+<br />
 
 ![Banner](./images/banner.jpg "Banner")
 
@@ -25,12 +28,15 @@ If you do not need it, remove the JAVA_OPTS customization relative to hudson.mod
 * Different test jobs, described afterwards
   ![jobs folders](./images/jenkins-jobs.png "jobs folders")
 
+<br />
 
 ## Test job folder *docker*:
 * default-agent
 * docker-agent
 * push_image_to_local_registry
 * docker-agent-from-local-registry (first run a local registry)
+
+<br />
 
 ## Test job folder *sonarqube*:
 * 01_build_netcore_sonarscanner_image_and_push_to_local_registry  
@@ -61,6 +67,8 @@ If you run second or third job, you will end up with these results in sonarqube:
 
 ![sonarqube project details](./images/sonarqube-project-details.png "contsonarqube project details")
 
+<br />
+
 ## Test job folder *selenium*:
 
 * a pipeline running a basic grid (3 browsers) and xunit UI tests against this grid
@@ -71,18 +79,29 @@ You can follow tests progress pointing your browser to http://localhost:4444
 
 ![selenium hub](./images/seleniumhub.png "selenium hub")
 
+<br />
 
 ## Test job folder *k6*:
 
-* a pipeline running k6 load test and publishing HTML report
+* a pipeline running k6 load test and publishing HTML report  
+  After job is run, you should see a new report published like this:
+![Jenkins HTML report](./images/jenkins-k6-test-results-html.png "Jenkins HTML report")
+
 * a pipeline running k6 load test and publishing k6 metrics to grafana
 Before running this job issue:
     
-    docker compose -f k6/docker-compose.yaml up
-    
+      docker compose -f k6/docker-compose.yaml up  
+
+  After job is run, you should see a new report published like this:
+![Grafana k6 dashboard](./images/grafana-k6-dashboard.png "Grafana k6 dashboard")
+
+<br />
+
 # Project *registry* folder
 
 * running a local (insecure) registry for hosting custom images (used as agent from jenkins)
+
+<br />
 
 # Porject *sonarqube* folder
 
@@ -97,15 +116,21 @@ Before running this job issue:
 
 * Dockerfile for creating a sonarqube netcore scanner for using as docker agent 
 
+<br />
+
 # Project *selenium* folder
 
 * a docker-compose.yml file for setting up a basic selenium grid
 * a xUnit project for testing the grid
 
+<br />
+
 # Project *k6* folder
 
 * a docker-compose.yml file for setting up influxdb:1.8 and grafana with a pre-provisioned dashboard for visualizing k6 load test results (take from [k6 repo](https://github.com/grafana/k6))
 * an example k6 load test also optionally generating HTML results (thank to [k6-reporter](https://github.com/benc-uk/k6-reporter) project )
+
+<br />
 
 # docker compose
 
