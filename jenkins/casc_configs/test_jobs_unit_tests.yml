@@ -1,0 +1,57 @@
+jobs:
+  - script: >
+      folder('test_jobs_unit_tests')
+  - script: >
+      pipelineJob('test_jobs_unit_tests/pitstop-unit-tests') {
+        description('Running netcore unit tests')
+        definition {
+          cps {
+            script("""\
+                pipeline {
+                  agent any
+                  stages {
+                    stage('checkout') {
+                      steps {
+                        cleanWs()
+
+                        git url: 'https://github.com/andreav/pitstop'
+                      }
+                    }
+
+                    stage('unit tests') {
+                      environment {
+                        DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                      }
+                      agent { 
+                        docker { 
+                            image 'mcr.microsoft.com/dotnet/sdk:5.0' 
+                            reuseNode true
+                        } 
+                      }			
+                      steps {
+                        dir("./src/WorkshopManagement.UnitTests") {
+                            sh "dotnet test . --logger:trx --results-directory ./TestResults /p:CollectCoverage=true /p:CoverletOutput=./TestResults/ /p:CoverletOutputFormat=cobertura%2Copencover%2Cjson"
+                        }                        
+
+                        // with plugin xUnit
+                        xunit([
+                            MSTest(
+                                deleteOutputFiles: false,
+                                failIfNotNew: true,
+                                pattern: '**/*.trx',
+                                skipNoTestFiles: false,
+                                stopProcessingIfError: true
+                            )
+                        ])
+
+                        // with mstest plugin
+                        //mstest failOnError: false
+                        
+                        cobertura autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/*cobertura.xml', conditionalCoverageTargets: '70, 0, 0', failUnhealthy: false, failUnstable: false, lineCoverageTargets: '80, 0, 0', maxNumberOfBuilds: 0, methodCoverageTargets: '80, 0, 0', onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false
+                      }
+                    }    
+                  }                
+                }""".stripIndent())
+              }
+            }
+          }          
