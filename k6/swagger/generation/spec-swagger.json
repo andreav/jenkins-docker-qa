@@ -1,0 +1,86 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+      "title": "VehicleManagement API",
+      "version": "v1"
+    },
+    "paths": {
+      "/api/Vehicles": {
+        "get": {
+          "tags": [
+            "Vehicles"
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        },
+        "post": {
+          "tags": [
+            "Vehicles"
+          ],
+          "requestBody": {
+            "content": {
+              "application/json-patch+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterVehicle"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterVehicle"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterVehicle"
+                }
+              },
+              "application/*+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterVehicle"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      },
+      "/api/Vehicles/{licenseNumber}": {
+        "get": {
+          "tags": [
+            "Vehicles"
+          ],
+          "operationId": "GetByLicenseNumber",
+          "parameters": [
+            {
+              "name": "licenseNumber",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "RegisterVehicle": {
+          "type": "object",
+          "additionalProperties": false
+        }
+      }
+    }
+  }

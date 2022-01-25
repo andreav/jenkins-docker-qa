@@ -4,3 +4,5 @@
 **/.vs/
 k6/summary.html
 k6/k6-test-results.json
+k6/swagger/generation/k6-test/*
+!k6/swagger/generation/k6-test/script.js
