@@ -48,6 +48,8 @@ public class UITests
     }
 
     [Fact]
+    [Trait("test", "TESTPROJ-10")]
+    [Trait("requirement","TESTPROJ-9")]
     public void Test_Chrome_SpecificVersion()
     {
         var chromeOptions = new ChromeOptions();
@@ -62,6 +64,7 @@ public class UITests
     [Theory]
     [InlineData(typeof(ChromeOptions))]
     [InlineData(typeof(FirefoxOptions))]
+    [Trait("Category","inlinedata")]
     public void Test_Theory_InlineBrowser(Type DriverOptionsType)
     {
         DriverOptions chromeOptions = Activator.CreateInstance(DriverOptionsType) as DriverOptions ?? throw new ArgumentNullException("Invalid type", nameof(DriverOptionsType));

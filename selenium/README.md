@@ -16,6 +16,8 @@ refs - https://github.com/SeleniumHQ/docker-selenium
     cd .\xunit-selenium-tests\
     dotnet new xunit
     dotnet add package Selenium.WebDriver
+
+    dotnet add package XunitXml.TestLogger
     ```
 
 * Add you tests ...
@@ -27,6 +29,8 @@ refs - https://github.com/SeleniumHQ/docker-selenium
 * Run tests
     ```
     dotnet test -l trx
+    dotnet test -l xunit
+    dotnet test -l xunit --filter  test=TESTPROJ-10
     ```
 
 
