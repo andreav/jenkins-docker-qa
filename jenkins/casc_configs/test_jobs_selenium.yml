@@ -34,6 +34,7 @@ jobs:
                     stage('running UI tests') {
                       environment {
                         DOTNET_CLI_HOME = "/tmp/DOTNET_CLI_HOME"
+                        XDG_DATA_HOME = "/tmp/DOTNET_CLI_HOME"
                         SELENIUM_HUB_ADDRESS = "http://host.docker.internal:4444"
                       }
                       agent { 

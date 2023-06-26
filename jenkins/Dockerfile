@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y docker-ce-cli docker-compose jq curl
 USER jenkins
 
 COPY --chown=jenkins:jenkins plugins.txt /usr/share/jenkins/ref/plugins.txt
-RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli -f /usr/share/jenkins/ref/plugins.txt
 
 RUN mkdir /var/jenkins_home/casc_configs/
 COPY --chown=jenkins:jenkins casc_configs/ /var/jenkins_home/casc_configs/
